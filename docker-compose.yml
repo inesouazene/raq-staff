@@ -1,0 +1,54 @@
+
+services:
+  # Service PostgreSQL
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  # Service Backend (Express)
+  backend:
+    build: ./backend
+    env_file:
+      - .env
+    ports:
+      - '5001:5001'
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+
+  # Service Frontend (React)
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+
+  # Service pgAdmin
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    ports:
+      - '5050:80'  # pgAdmin sera accessible sur le port 5050
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}  # Déjà défini dans le .env
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}  # Déjà défini dans le .env
+
+volumes:
+  pgdata:
+  pgadmin_data:
