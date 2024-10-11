@@ -4,42 +4,66 @@ const db = require('./database');
 
 class Employee {
   static async getAll() {
-    const { rows } = await db.query('SELECT * FROM salarie');
-    return rows;
-  };
-	static async getById(id) {
-		const { rows } = await db.query('SELECT * FROM salarie WHERE id = $1', [id]);
-		return rows[0];
-	};
-	static async create(employeeData) {
-    const { nom, prenom, date_naissance, email, telephone, heures_contrat, type_contrat } = employeeData;
+    try {
+      const query = 'SELECT * FROM salarie ORDER BY prenom';
+      const { rows } = await db.query(query);
+      return rows;
+    } catch (error) {
+      console.error('Error in getAll:', error);
+      throw error;
+    }
+  }
+
+  static async getById(id) {
+    try {
+      const query = 'SELECT * FROM salarie WHERE id = $1';
+      const { rows } = await db.query(query, [id]);
+      return rows[0];
+    } catch (error) {
+      console.error('Error in getById:', error);
+      throw error;
+    }
+  }
+
+  static async getAllWithFormattedTimeSlots(startDate, endDate) {
     const query = `
-      INSERT INTO salarie (nom, prenom, date_naissance, email, telephone, heures_contrat, type_contrat)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *
+      SELECT
+        s.id, s.nom, s.prenom, s.type_contrat,
+        json_agg(
+          CASE WHEN ph.id IS NOT NULL THEN
+            json_build_object(
+              'id', ph.id,
+              'start', concat(ph.date, ' ', ph.heure_debut),
+              'end', concat(ph.date, ' ', ph.heure_fin),
+              'resourceId', s.id,
+              'title', p.nom,
+              'bgColor', p.couleur,
+              'description', ph.description
+            )
+          ELSE NULL END
+        ) FILTER (WHERE ph.id IS NOT NULL) AS events
+      FROM salarie s
+      LEFT JOIN plage_horaire ph ON s.id = ph.id_salarie AND ph.date BETWEEN $1 AND $2
+      LEFT JOIN position p ON ph.id_position = p.id
+      GROUP BY s.id
+      ORDER BY s.nom, s.prenom
     `;
-    const values = [nom, prenom, date_naissance, email, telephone, heures_contrat, type_contrat];
-    const { rows } = await db.query(query, values);
-    return rows[0];
-  };
-	static async update(id, employeeData) {
-    const { nom, prenom, date_naissance, telephone, email, heures_contrat, type_contrat } = employeeData;
-    const query = `
-      UPDATE salarie
-      SET nom = $1, prenom = $2, date_naissance = $3, telephone = $4, email = $5, heures_contrat = $6, type_contrat = $7
-      WHERE id = $8
-      RETURNING *
-    `;
-    const values = [nom, prenom, date_naissance, telephone, email, heures_contrat, type_contrat, id];
-    const { rows } = await db.query(query, values);
-    return rows[0];
-  };
-	static async delete(id) {
-    const query = 'DELETE FROM salarie WHERE id = $1 RETURNING *';
-    const values = [id];
-    const { rows } = await db.query(query, values);
-    return rows[0];
-  };
+
+    try {
+      const { rows } = await db.query(query, [startDate, endDate]);
+      return rows.map(row => ({
+        id: row.id,
+        name: `${row.prenom} ${row.nom}`,
+        type_contrat: row.type_contrat,
+        events: row.events || []
+      }));
+    } catch (error) {
+      console.error('Error in getAllWithFormattedTimeSlots:', error);
+      throw error;
+    }
+  }
+
+  // Ajoutez d'autres méthodes si nécessaire
 }
 
 module.exports = Employee;

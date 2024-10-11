@@ -18,11 +18,13 @@ app.use(express.json());
 const homeRoutes = require('./routes/homeRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const userRoutes = require('./routes/userRoutes');
+const scheduleRoutes = require('./routes/scheduleRoutes');
 
 // Use routes
 app.use('/', homeRoutes);
 app.use('/employees', employeeRoutes);
 app.use('/users', userRoutes);
+app.use('/schedules', scheduleRoutes);
 
 // Start the server
 app.listen(PORT, () => {
