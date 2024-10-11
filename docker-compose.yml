@@ -24,13 +24,16 @@ services:
     depends_on:
       - postgres
 
-  # Service Frontend (React)
+  # Service Frontend (React avec Vite)
   frontend:
     build: ./frontend
     ports:
       - '3000:3000'
     volumes:
-      - ./frontend:/app
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
 
