@@ -1,0 +1,42 @@
+.WeekPicker{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	gap: 10px;
+}
+
+
+
+.rs-picker-toggle-wrapper {
+    display: inline-block;
+    max-width: 150%;
+    vertical-align: middle;
+}
+
+.rs-calendar-table-cell-week-number{
+	background-color: green;
+	color: white;
+	font-weight: bolder;
+}
+.rs-calendar-table-row:not(.rs-calendar-table-header-row):hover .rs-calendar-table-cell-content {
+    background-color: rgba(204,233,255,.5);
+    background-color: var(--rs-listbox-option-hover-bg);
+    color: #1675e0;
+    color: var(--rs-listbox-option-hover-text);
+}
+
+.rs-calendar-table-row:not(.rs-calendar-table-header-row):has(.rs-calendar-table-cell-selected) .rs-calendar-table-cell-content {
+    background-color: #3498ff;
+    background-color: var(--rs-bg-active);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    color: #fff;
+    color: var(--rs-calendar-date-selected-text);
+}
+
+
+.rs-input {
+	text-align: center;
+	color:#3498ff;
+	font-weight: bold;
+}
