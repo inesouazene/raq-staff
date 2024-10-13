@@ -11,7 +11,7 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        <h1 className="app-title">Employee Planning Application</h1>
+        <h1 className="app-title">Raq&Staff</h1>
         <Navigation />
         <main className="app-content">
           <Routes>
