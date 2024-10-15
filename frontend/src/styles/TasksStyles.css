@@ -1,0 +1,23 @@
+.task {
+	color: grey;
+	padding: 10px;
+	margin: 15px;
+	border-radius: 10px;
+	box-shadow: 4px 3px 3px grey;
+	background-color: white !important;
+  }
+
+.task-time {
+	font-weight: bolder;
+	color:black;
+}
+
+.task-title {
+	color:grey;
+	font-weight: bold;
+}
+
+.task:hover {
+	transform: scale(1.02);
+	box-shadow: 5px 5px 5px grey;
+}

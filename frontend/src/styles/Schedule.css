@@ -4,29 +4,43 @@
   }
 
   .schedule-table {
+	table-layout: fixed;
 	width: 100%;
 	border-collapse: collapse;
   }
 
   .schedule-table th, .schedule-table td {
 	border: 1px solid #ddd;
-	padding: 8px;
-	text-align: center;
   }
 
   .schedule-table th {
 	background-color: #f2f2f2;
 	font-weight: bold;
+	padding: 8px;
   }
 
   .schedule-table td {
 	height: 50px;
   }
 
-  .schedule-table td:hover {
-	background-color: rgba(204,233,255,.5);
-  }
+.schedule-table td:hover {
+background-color: rgba(204,233,255,.5);
+}
 
-	.schedule-container h1 {
-		text-align: left;
-	}
+.schedule-container h1 {
+	text-align: left;
+}
+
+.employee-name {
+	text-align: center;
+	padding: 5px;
+	text-transform: initial;
+}
+
+.total-header {
+	width: 5%;
+}
+
+.employee-header {
+	width: 8%;
+}
