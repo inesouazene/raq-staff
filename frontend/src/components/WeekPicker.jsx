@@ -70,11 +70,11 @@ const WeekPicker = ({ onChange }) => {
   return (
     <CustomProvider locale={frFR}>
       <div className="WeekPicker">
-        <Button onClick={handlePrevWeek} color="green" appearance="ghost">
+        <Button onClick={handlePrevWeek} color="cyan" appearance="primary" size='lg'>
           <FaArrowLeft />
         </Button>
         <DatePicker
-          style={{ width: '15%' }}
+          style={{ width: '20%' }}
           appearance="subtle"
           caretAs={FaCalendarCheck}
           placeholder="Sélectionner une semaine"
@@ -85,7 +85,7 @@ const WeekPicker = ({ onChange }) => {
           renderValue={renderValue}
           cleanable
         />
-        <Button onClick={handleNextWeek} color="green" appearance="ghost">
+        <Button onClick={handleNextWeek} color="cyan" appearance="primary" size='lg'>
           <FaArrowRight />
         </Button>
       </div>
