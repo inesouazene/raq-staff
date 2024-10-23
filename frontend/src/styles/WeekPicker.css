@@ -6,18 +6,27 @@
 }
 
 
-
 .rs-picker-toggle-wrapper {
     display: inline-block;
-    max-width: 150%;
+    max-width: 90%;
     vertical-align: middle;
 }
 
 .rs-calendar-table-cell-week-number{
-	background-color: green;
+	background-color: #4caf50;
 	color: white;
 	font-weight: bolder;
 }
+
+.rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus {
+	border-color: #00bcd4;
+}
+
+.rs-btn-primary {
+	background-color: #00bcd4;
+}
+
+
 .rs-calendar-table-row:not(.rs-calendar-table-header-row):hover .rs-calendar-table-cell-content {
     background-color: rgba(204,233,255,.5);
     background-color: var(--rs-listbox-option-hover-bg);
@@ -26,8 +35,8 @@
 }
 
 .rs-calendar-table-row:not(.rs-calendar-table-header-row):has(.rs-calendar-table-cell-selected) .rs-calendar-table-cell-content {
-    background-color: #3498ff;
-    background-color: var(--rs-bg-active);
+    background-color: #00bcd4;
+    background-color: #00bcd4;
     -webkit-box-shadow: none;
     box-shadow: none;
     color: #fff;
@@ -37,6 +46,7 @@
 
 .rs-input {
 	text-align: center;
-	color:#3498ff;
+	color:#00bcd4;
 	font-weight: bold;
+	cursor: pointer;
 }
