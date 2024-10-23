@@ -1,46 +1,36 @@
+
 .schedule-container {
-	margin: 20px;
-	padding: 20px;
+	padding: 0;
   }
 
-  .schedule-table {
+  .MuiTable-root {
 	table-layout: fixed;
 	width: 100%;
-	border-collapse: collapse;
   }
 
-  .schedule-table th, .schedule-table td {
-	border: 1px solid #ddd;
-  }
 
-  .schedule-table th {
-	background-color: #f2f2f2;
-	font-weight: bold;
-	padding: 8px;
-  }
-
-  .schedule-table td {
-	height: 50px;
-  }
-
-.schedule-table td:hover {
-background-color: rgba(204,233,255,.5);
-}
-
-.schedule-container h1 {
-	text-align: left;
-}
-
-.employee-name {
-	text-align: center;
-	padding: 5px;
-	text-transform: initial;
-}
-
-.total-header {
-	width: 5%;
-}
-
-.employee-header {
+.MuiTableCell-head.employee-header {
 	width: 8%;
+}
+
+.MuiTableCell-body.hoursPerWeek {
+	font-weight: bold;
+	text-align: right;
+}
+
+.MuiTableCell-head.total-header {
+	width: 8%;
+}
+ .MuiIconButton-root {
+	border-radius: 5px;
+	max-width: fit-content;
+	padding: 5px;
+  }
+
+.MuiToolbar-root {
+	padding: 0;
+}
+
+.MuiToolbar-root.app-bar {
+	padding: 0px 12px;
 }
