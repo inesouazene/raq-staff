@@ -1,16 +1,32 @@
+// Schedule.jsx
 import { useState, useEffect } from "react";
 import api from "../services/api";
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, parseISO, parse, differenceInMinutes } from 'date-fns';
+import {
+  format,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  parseISO,
+  parse,
+  differenceInMinutes,
+} from 'date-fns';
 import { fr } from 'date-fns/locale';
-import "../styles/Schedule.css";
-import "../styles/TasksStyles.css"
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Toolbar, Box,
+	Tooltip, IconButton
+} from '@mui/material';
 import WeekPicker from "./WeekPicker";
+import "../styles/Schedule.css";
+import "../styles/TasksStyles.css";
+import { AddOutlined, FileDownloadOutlined, Delete } from "@mui/icons-material";
+import CustomDrawer from "./CustomDrawer";
 
-// Fonction pour obtenir les dates du lundi au dimanche pour une semaine donnée
+
+
 const getWeekDates = (date) => {
   const start = startOfWeek(new Date(date), { weekStartsOn: 1 });
   const end = endOfWeek(new Date(date), { weekStartsOn: 1 });
-  return eachDayOfInterval({ start, end }).map(day => format(day, 'yyyy-MM-dd')); // Format YYYY-MM-DD
+  return eachDayOfInterval({ start, end }).map(day => format(day, 'yyyy-MM-dd'));
 };
 
 const Schedule = () => {
@@ -18,8 +34,9 @@ const Schedule = () => {
   const [tasks, setTasks] = useState([]);
   const [weekDate, setWeekDate] = useState(new Date());
   const [weekDates, setWeekDates] = useState(getWeekDates(weekDate));
+	const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
 
-  // Chargement des employés
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,45 +49,38 @@ const Schedule = () => {
     fetchData();
   }, []);
 
-  // Récupérer les tâches pour la semaine sélectionnée
-	useEffect(() => {
-		const fetchTasksForWeek = async () => {
-			try {
-				const start = format(startOfWeek(weekDate, { weekStartsOn: 1 }), 'yyyy-MM-dd');
-				const end = format(endOfWeek(weekDate, { weekStartsOn: 1 }), 'yyyy-MM-dd');
-				const tasksData = await api.getTasksByWeek(start, end);
+  useEffect(() => {
+    const fetchTasksForWeek = async () => {
+      try {
+        const start = format(startOfWeek(weekDate, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+        const end = format(endOfWeek(weekDate, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+        const tasksData = await api.getTasksByWeek(start, end);
 
-				console.log("Taches récupérées:", tasksData);
-				setTasks(tasksData);
-			} catch (error) {
-				console.error("Erreur lors de la récupération des tâches", error);
-			}
-		};
+        setTasks(tasksData);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des tâches", error);
+      }
+    };
 
-		fetchTasksForWeek();
-	}, [weekDate]);
+    fetchTasksForWeek();
+  }, [weekDate]);
 
-
-  // Mettre à jour les dates de la semaine chaque fois que weekDate change
   useEffect(() => {
     setWeekDates(getWeekDates(weekDate));
   }, [weekDate]);
 
-  // Fonction passée à WeekPicker pour mettre à jour la date sélectionnée
   const handleWeekChange = (objWeek) => {
     setWeekDate(objWeek.date);
   };
 
-  // Fonction de formatage du nom du salarié
   const formatEmployeeName = (fullName) => {
     const [firstName, lastName] = fullName.split(" ");
     if (lastName) {
       return `${firstName} ${lastName.charAt(0)}.`; // John D.
     }
-    return firstName; // Si aucun nom de famille n'est fourni
+    return firstName;
   };
 
-  // Fonction pour trouver et trier toutes les tâches correspondant à un salarié et une date donnée
   const getTasksForEmployeeAndDate = (employeeId, date) => {
     const tasksForDay = tasks
       .filter(task => {
@@ -78,95 +88,156 @@ const Schedule = () => {
         return task.id_salarie === employeeId && taskDate === date;
       })
       .sort((a, b) => {
-        // Compare les heures de début pour trier les tâches
         return a.heure_debut.localeCompare(b.heure_debut); // Trie par heure de début
       });
 
-    return tasksForDay; // Renvoie les tâches triées par heure
+    return tasksForDay;
   };
 
-	// Fonction pour calculer la durée en heures d'une tâche
-	const calculateTaskDuration = (heure_debut, heure_fin) => {
-  const start = parse(heure_debut, 'HH:mm:ss', new Date());
-  const end = parse(heure_fin, 'HH:mm:ss', new Date());
-  const difference = differenceInMinutes(end, start); // Différence en minutes
-  return difference / 60; // Convertir en heures
-	};
+  const calculateTaskDuration = (heure_debut, heure_fin) => {
+    const start = parse(heure_debut, 'HH:mm:ss', new Date());
+    const end = parse(heure_fin, 'HH:mm:ss', new Date());
+    const difference = differenceInMinutes(end, start); // Différence en minutes
+    return difference / 60; // Convertir en heures
+  };
 
-	// Fonction pour calculer les heures totales d'un salarié sur une semaine
-	const calculateTotalHoursForWeek = (employeeId) => {
-  let totalHours = 0;
+  const calculateTotalHoursForWeek = (employeeId) => {
+    let totalHours = 0;
 
-  // Parcourir chaque jour de la semaine et calculer les heures
-  weekDates.forEach((date) => {
-    const tasksForDay = getTasksForEmployeeAndDate(employeeId, date);
-
-    // Additionner la durée de chaque tâche
-    tasksForDay.forEach((task) => {
-      totalHours += calculateTaskDuration(task.heure_debut, task.heure_fin);
+    weekDates.forEach((date) => {
+      const tasksForDay = getTasksForEmployeeAndDate(employeeId, date);
+      tasksForDay.forEach((task) => {
+        totalHours += calculateTaskDuration(task.heure_debut, task.heure_fin);
+      });
     });
-  });
-  return totalHours.toFixed(2); // Retourner le total avec deux décimales
-	};
+    return totalHours.toFixed(2);
+  };
+
+const openAddDrawer = () => setIsAddDrawerOpen(true);
+const closeAddDrawer = () => setIsAddDrawerOpen(false);
 
   return (
     <div className="schedule-container">
-      <h1>Planning</h1>
+			<Toolbar
+				className="toolbar-schedule"
+				sx={{
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					width: '100%',
+					marginBottom: 1,
+				}}
+			>
+				{/* Section gauche pour les boutons */}
+				<Box sx={{ display: 'flex', gap: 1, width: '5%' }}>
+					<Tooltip title='Créer une plage horaire' placement="top">
+						<IconButton
+							onClick={openAddDrawer}
+							sx={{
+								'&:hover': {
+									backgroundColor: '#8BC34A',
+								},
+							}}
+						>
+							<AddOutlined />
+						</IconButton>
+					</Tooltip>
 
-      {/* Intégration de WeekPicker */}
-      <WeekPicker onChange={handleWeekChange} />
+					<Tooltip title='Télécharger en PDF' placement="top">
+						<IconButton
+							sx={{
+								'&:hover': {
+									backgroundColor: '#FFC107',
+								},
+							}}
+						>
+							<FileDownloadOutlined />
+						</IconButton>
+					</Tooltip>
+				</Box>
 
-      <table className="schedule-table">
-        <thead>
-          <tr>
-            <th className="employee-header">Salariés</th>
+				{/* Section centrale pour le WeekPicker */}
+				<Box sx={{ flexGrow: 1, display: 'initial', justifyContent: 'center' }}>
+					<WeekPicker onChange={handleWeekChange} />
+				</Box>
+
+				{/* Section droite vide pour l'équilibre */}
+				<Box sx={{ width: '5%' }} /> {/* Largeur équivalente à la section des boutons */}
+			</Toolbar>
+
+      {/* Utilisation de Material-UI Table */}
+      <TableContainer component={Paper}>
+        <Table aria-label="schedule table">
+          <TableHead>
+            <TableRow>
+              <TableCell className="employee-header">Salariés</TableCell>
               {weekDates.map((date) => (
-                <th key={date}>
-                  {format(new Date(date), 'EEE dd MMM', { locale: fr })} {/* 'EEE' affiche le nom abrégé du jour */}
-                </th>
+                <TableCell key={date} className="days">
+                  {format(new Date(date), 'EEE dd MMM', { locale: fr })}
+                </TableCell>
+              ))}
+              <TableCell className="total-header" sx={{ width: 'auto' }}>Total</TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {employees.map((employee) => (
+              <TableRow key={employee.id}>
+                <TableCell>{formatEmployeeName(employee.name)}</TableCell>
+                {weekDates.map((date) => {
+                  const tasksForDay = getTasksForEmployeeAndDate(employee.id, date);
+
+                  return (
+                    <TableCell key={date}>
+                      {tasksForDay.length > 0 ? (
+                        tasksForDay.map((task) => {
+                          const taskStyle = {
+                            border: `3px dashed ${task.couleur}`,
+                          };
+
+                          return (
+                            <div key={task.id} className="task" style={taskStyle} >
+
+                              <span className="task-time">
+                                {format(parse(task.heure_debut, 'HH:mm:ss', new Date()), 'HH:mm')} - {format(parse(task.heure_fin, 'HH:mm:ss', new Date()), 'HH:mm')}
+                              </span><br />
+                              <span className="task-title">{task.nom_type_tache}</span><br />
+															<div className="delete-task">
+															<IconButton
+																aria-label="delete"
+																size="small"
+																sx={{
+																	color: '#EF5350',
+																	'&:hover': {
+																		backgroundColor: '#FFEBEE',
+																	},
+
+																}}
+															>
+																<Delete fontSize="inherit" />
+															</IconButton>
+															</div>
+                            </div>
+                          );
+                        })
+                      ) : null}
+                    </TableCell>
+                  );
+                })}
+                <TableCell className="hoursPerWeek">{calculateTotalHoursForWeek(employee.id)} h</TableCell>
+              </TableRow>
             ))}
-            <th className="total-header">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map((employee) => (
-            <tr key={employee.id}>
-              <td className="employee-name">{formatEmployeeName(employee.name)}</td>
-              {weekDates.map((date) => {
-                const tasksForDay = getTasksForEmployeeAndDate(employee.id, date);
-
-                return (
-                  <td key={date}>
-                    {tasksForDay.length > 0 ? (
-                      tasksForDay.map((task) => {
-												console.log(task);
-
-												// Style dynamique basé sur la couleur de la tâche
-												const taskStyle = {
-													border: `3px dashed ${task.couleur}`,
-												};
-
-												return (
-													<div key={task.id} className="task" style={taskStyle}>
-														<span className="task-time">
-															{format(parse(task.heure_debut, 'HH:mm:ss', new Date()), 'HH:mm')} - {format(parse(task.heure_fin, 'HH:mm:ss', new Date()), 'HH:mm')}
-														</span><br />
-														<span className="task-title">{task.nom_type_tache}</span>
-													</div>
-												);
-											})
-                    ) : null}   {/* Si aucune tâche, la cellule est vide */}
-                  </td>
-                );
-              })}
-              <td className="total-hours">
-								{calculateTotalHoursForWeek(employee.id)} heures
-							</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+          </TableBody>
+        </Table>
+      </TableContainer>
+			<CustomDrawer
+				isOpen={isAddDrawerOpen}
+				onClose={closeAddDrawer}
+				title="Ajouter une plage horaire"
+			>
+				{/* Le contenu du formulaire sera ajouté ici plus tard */}
+				<p>Formulaire d&lsquo;ajout de plage horaire à venir</p>
+			</CustomDrawer>
     </div>
   );
 };
