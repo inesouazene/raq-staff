@@ -13,6 +13,9 @@ router.get('/tasks/week', scheduleController.getTasksByWeek);
 // Route pour ajouter une nouvelle tâche
 router.post('/tasks/add', scheduleController.addTask);
 
+// Route pour récupérer une tâche par son id
+router.get('/tasks/:id', scheduleController.getTaskById);
+
 // Route pour supprimer une tâche
 router.delete('/tasks/:id', scheduleController.deleteTask);
 
@@ -21,5 +24,6 @@ router.put('/tasks/:id', scheduleController.updateTask);
 
 // Route pour récupérer les types de tâches
 router.get('/task-types', scheduleController.getTaskTypes);
+
 
 module.exports = router;
