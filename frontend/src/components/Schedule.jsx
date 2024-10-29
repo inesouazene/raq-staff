@@ -8,6 +8,7 @@ import { AddOutlined, FileDownloadOutlined, Delete, PauseCircleOutlined } from "
 import api from "../services/api";
 import WeekPicker from "./WeekPicker";
 import AddTasksForm from "./AddTasksForm";
+import UpdateTasksForm from "./UpdateTasksForm";
 import CustomDrawer from "./CustomDrawer";
 import "../styles/Schedule.css";
 import "../styles/TasksStyles.css";
@@ -28,6 +29,7 @@ const Schedule = () => {
 	const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+	const [isUpdateDrawerOpen, setIsUpdateDrawerOpen] = useState(false);
 
   // Fonction pour charger les tâches de la semaine
   const fetchTasksForWeek = useCallback(async () => {
@@ -52,7 +54,18 @@ const Schedule = () => {
     }
   };
 
-  // Ouverture et fermeture du drawer
+  // Formulaire de mise à jour de tâche
+  const handleUpdateTaskSubmit = async (formData) => {
+    try {
+      await api.updateTask(selectedTaskId, formData);  // Update task by ID
+      await fetchTasksForWeek();
+      setIsUpdateDrawerOpen(false); // Close drawer after update
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la tâche", error);
+    }
+  };
+
+  // Ouverture et fermeture du drawer d'ajout
   const openAddDrawer = () => setIsAddDrawerOpen(true);
   const closeAddDrawer = () => setIsAddDrawerOpen(false);
 
@@ -61,6 +74,16 @@ const Schedule = () => {
 
 	// Fonction pour fermer l'alerte de suppression automatiquement
 	const handleDeleteAlertClose = () => setDeleteAlertOpen(false);
+
+  // Ouverture et fermeture du drawer de mise à jour
+  const openUpdateDrawer = (taskId) => {
+    setSelectedTaskId(taskId);
+    setIsUpdateDrawerOpen(true);
+  };
+  const closeUpdateDrawer = () => {
+		setIsUpdateDrawerOpen(false);
+		setSelectedTaskId(null);
+	}
 
 
   // Chargement des employés
@@ -225,7 +248,7 @@ const Schedule = () => {
                   return (
                     <TableCell key={date}>
                       {tasksForDay.map((task) => (
-												<div key={task.id} className="task" style={{ borderLeft: `5px solid ${task.couleur}` }}>
+												<div key={task.id} className="task" onClick={() => openUpdateDrawer(task.id)} style={{ borderLeft: `5px solid ${task.couleur}` }}>
 													<span className="task-time">
 														{format(parse(task.heure_debut, "HH:mm:ss", new Date()), "HH:mm")} - {format(parse(task.heure_fin, "HH:mm:ss", new Date()), "HH:mm")}
 													</span>
@@ -239,8 +262,11 @@ const Schedule = () => {
 															aria-label="delete"
 															size="small"
 															sx={{ color: "#B71C1C", "&:hover": { backgroundColor: "#FFEBEE" } }}
-															onClick={() => handleDeleteTaskClick(task.id)} // Demande de confirmation
-															>
+															onClick={(event) => {
+																event.stopPropagation(); // Empêche l'ouverture du Drawer
+																handleDeleteTaskClick(task.id); // Exécute uniquement la suppression
+															}}
+														>
 															<Delete fontSize="inherit" />
 														</IconButton>
 
@@ -261,6 +287,12 @@ const Schedule = () => {
       <CustomDrawer isOpen={isAddDrawerOpen} onClose={closeAddDrawer} title="Créer une plage horaire">
         <AddTasksForm onSubmit={handleTaskSubmit} onClose={closeAddDrawer} />
       </CustomDrawer>
+
+			{isUpdateDrawerOpen && selectedTaskId && (
+				<CustomDrawer isOpen={isUpdateDrawerOpen} onClose={closeUpdateDrawer} title="Modifier la plage horaire">
+					<UpdateTasksForm taskId={selectedTaskId} onUpdate={handleUpdateTaskSubmit} onClose={closeUpdateDrawer} />
+				</CustomDrawer>
+			)}
 
 			{/* Dialog de confirmation de suppression */}
       <Dialog
