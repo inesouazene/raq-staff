@@ -5,6 +5,10 @@ import CssBaseline from '@mui/material/CssBaseline';
 import DashboardLayout from './components/DashboardLayout';
 import { lazy, Suspense } from 'react';
 import { lightTheme, darkTheme } from './themes/theme';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Pour date-fns v3 ou v4
+import { fr } from 'date-fns/locale';
+
 
 // Importing the lazy-loaded components
 const HomePage = lazy(() => import('./components/HomePage'));
@@ -20,6 +24,7 @@ function App() {
   };
 
   return (
+	<LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <CssBaseline />
       <Router>
@@ -35,6 +40,8 @@ function App() {
         </DashboardLayout>
       </Router>
     </ThemeProvider>
+	</LocalizationProvider>
+
   );
 }
 
