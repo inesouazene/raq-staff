@@ -1,3 +1,4 @@
+// src/services/api.js
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5001'; // Ajustez l'URL si nécessaire
@@ -13,21 +14,54 @@ const api = {
       throw error;
     }
   },
-	// Récupérer les tâches d'une semaine spécifique
-	getTasksByWeek: async (startOfWeek, endOfWeek) => {
-		try {
-			const response = await axios.get(`${API_URL}/schedules/tasks/week`, {
-				params: {
-					startOfWeek,
-					endOfWeek
-				}
-			});
-			return response.data;
-		} catch (error) {
-			console.error("Erreur lors de la récupération des tâches : ", error);
-			throw error;
-		}
-	}
+
+  // Récupérer les tâches d'une semaine spécifique
+  getTasksByWeek: async (startOfWeek, endOfWeek) => {
+    try {
+      const response = await axios.get(`${API_URL}/schedules/tasks/week`, {
+        params: {
+          startOfWeek,
+          endOfWeek
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des tâches : ", error);
+      throw error;
+    }
+  },
+
+  // Ajouter une nouvelle tâche
+  addTask: async (taskData) => {
+    try {
+      const response = await axios.post(`${API_URL}/schedules/tasks/add`, taskData);
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de la tâche : ", error);
+      throw error;
+    }
+  },
+
+  // Récupérer les types de tâche
+  getTaskTypes: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/schedules/task-types`);
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des types de tâche : ", error);
+      throw error;
+    }
+  },
+
+	// Supprimer une tâche
+	deleteTask: async (taskId) => {
+    try {
+      await axios.delete(`${API_URL}/schedules/tasks/${taskId}`);
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la tâche", error);
+      throw error;
+    }
+  },
 };
 
 export default api;
