@@ -3,6 +3,7 @@
 import PropTypes from 'prop-types';
 import { Drawer, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import '../styles/CustomDrawer.css';
 
 const CustomDrawer = ({ isOpen, onClose, title, children }) => {
   return (
@@ -30,7 +31,7 @@ const CustomDrawer = ({ isOpen, onClose, title, children }) => {
       >
         <CloseIcon />
       </IconButton>
-      <div style={{ width: 300, padding: '40px 20px' }}>
+      <div className="form-content" style={{ width: '100%', padding: '40px 10px' }}>
         <h2>{title}</h2>
         {children}
       </div>
