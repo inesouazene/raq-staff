@@ -42,6 +42,28 @@ const api = {
     }
   },
 
+	// Récupérer les données d'une tâche par son id
+	getTaskById: async (taskId) => {
+    try {
+      const response = await axios.get(`${API_URL}/schedules/tasks/${taskId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la tâche : ", error);
+      throw error;
+    }
+  },
+
+	// Mettre à jour une tâche
+	updateTask: async (taskId, taskData) => {
+		try {
+			const response = await axios.put(`${API_URL}/schedules/tasks/${taskId}`, taskData);
+			return response.data;
+		} catch (error) {
+			console.error("Erreur lors de la mise à jour de la plage horaire : ", error);
+			throw error;
+		}
+	},
+
   // Récupérer les types de tâche
   getTaskTypes: async () => {
     try {
@@ -62,6 +84,6 @@ const api = {
       throw error;
     }
   },
-};
 
+}
 export default api;
