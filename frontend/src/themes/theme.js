@@ -23,6 +23,20 @@ export const lightTheme = createTheme({
     },
   },
   components: {
+		MuiOutlinedInput: {
+			styleOverrides: {
+				root: {
+					borderRadius: '10px', // Applique un border-radius aux champs Outlined dans les deux thèmes
+				},
+			},
+		},
+		MuiSelect: {
+			styleOverrides: {
+				outlined: {
+					borderRadius: '10px', // Applique un border-radius aux champs Select dans les deux thèmes
+				},
+			},
+		},
     MuiTable: {
       styleOverrides: {
         root: {},
@@ -88,6 +102,20 @@ export const darkTheme = createTheme({
     },
   },
   components: {
+		MuiOutlinedInput: {
+			styleOverrides: {
+				root: {
+					borderRadius: '10px', // Applique un border-radius aux champs Outlined dans les deux thèmes
+				},
+			},
+		},
+		MuiSelect: {
+			styleOverrides: {
+				outlined: {
+					borderRadius: '10px', // Applique un border-radius aux champs Select dans les deux thèmes
+				},
+			},
+		},
     MuiTable: {
       styleOverrides: {
         root: {
