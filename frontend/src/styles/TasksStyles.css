@@ -1,7 +1,7 @@
 .task {
 	color: grey;
 	padding: 5% 0 0 5%;
-	border-radius: 10px;
+	border-radius: 5px;
 	margin-bottom: 5px;
 	box-shadow: 4px 3px 3px grey;
 	background-color: white !important;
@@ -28,3 +28,11 @@
 	justify-content: right;
 	margin-top: -15px;
 }
+
+.task-pause {
+	display: inline-flex;
+	vertical-align: middle;
+	align-items: center;
+	padding: 0;
+	gap: 4px; /* Espace entre l'icône et le texte */
+  }
