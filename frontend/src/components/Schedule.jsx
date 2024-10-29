@@ -12,6 +12,8 @@ import UpdateTasksForm from "./UpdateTasksForm";
 import CustomDrawer from "./CustomDrawer";
 import "../styles/Schedule.css";
 import "../styles/TasksStyles.css";
+import GeneratePDF from "./GeneratePDF";
+
 
 const getWeekDates = (date) => {
   const start = startOfWeek(new Date(date), { weekStartsOn: 1 });
@@ -25,11 +27,11 @@ const Schedule = () => {
   const [weekDate, setWeekDate] = useState(new Date());
   const [weekDates, setWeekDates] = useState(getWeekDates(weekDate));
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
-	const [alertOpen, setAlertOpen] = useState(false);
-	const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
-	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
-	const [isUpdateDrawerOpen, setIsUpdateDrawerOpen] = useState(false);
+  const [isUpdateDrawerOpen, setIsUpdateDrawerOpen] = useState(false);
 
   // Fonction pour charger les tâches de la semaine
   const fetchTasksForWeek = useCallback(async () => {
@@ -48,7 +50,7 @@ const Schedule = () => {
     try {
       await api.addTask(formData);
       await fetchTasksForWeek(); // Rafraîchit les tâches après ajout
-			setAlertOpen(true); // Affiche l'alerte
+      setAlertOpen(true); // Affiche l'alerte
     } catch (error) {
       console.error("Erreur lors de l'ajout de la plage horaire", error);
     }
@@ -72,8 +74,8 @@ const Schedule = () => {
   // Fonction pour fermer l'alerte d'ajout automatiquement
   const handleAlertClose = () => setAlertOpen(false);
 
-	// Fonction pour fermer l'alerte de suppression automatiquement
-	const handleDeleteAlertClose = () => setDeleteAlertOpen(false);
+  // Fonction pour fermer l'alerte de suppression automatiquement
+  const handleDeleteAlertClose = () => setDeleteAlertOpen(false);
 
   // Ouverture et fermeture du drawer de mise à jour
   const openUpdateDrawer = (taskId) => {
@@ -81,10 +83,9 @@ const Schedule = () => {
     setIsUpdateDrawerOpen(true);
   };
   const closeUpdateDrawer = () => {
-		setIsUpdateDrawerOpen(false);
-		setSelectedTaskId(null);
-	}
-
+    setIsUpdateDrawerOpen(false);
+    setSelectedTaskId(null);
+  }
 
   // Chargement des employés
   useEffect(() => {
@@ -127,57 +128,67 @@ const Schedule = () => {
   const calculateTaskDuration = (heure_debut, heure_fin, pause = 0) => {
     const start = parse(heure_debut, "HH:mm:ss", new Date());
     const end = parse(heure_fin, "HH:mm:ss", new Date());
-		const difference = differenceInMinutes(end, start) - pause; // Soustraction de la pause
-		return Math.max(difference / 60, 0); // Convertir en heures et s'assurer que le résultat est non négatif
+    const difference = differenceInMinutes(end, start) - pause; // Soustraction de la pause
+    return Math.max(difference / 60, 0); // Convertir en heures et s'assurer que le résultat est non négatif
   };
 
-	const calculateTotalHoursForWeek = (employeeId) => {
-		let totalHours = 0;
-		weekDates.forEach((date) => {
-			const tasksForDay = getTasksForEmployeeAndDate(employeeId, date);
-			tasksForDay.forEach((task) => {
-				totalHours += calculateTaskDuration(task.heure_debut, task.heure_fin, task.pause || 0);
-			});
-		});
-		return totalHours.toFixed(2);
-	};
+  const calculateTotalHoursForWeek = (employeeId) => {
+    let totalHours = 0;
+    weekDates.forEach((date) => {
+      const tasksForDay = getTasksForEmployeeAndDate(employeeId, date);
+      tasksForDay.forEach((task) => {
+        totalHours += calculateTaskDuration(task.heure_debut, task.heure_fin, task.pause || 0);
+      });
+    });
+    return totalHours.toFixed(2);
+  };
 
-	// Fonction pour formater la durée de la pause en heures et minutes
-	const formatPause = (minutes) => {
-		const hours = Math.floor(minutes / 60);
-		const remainingMinutes = minutes % 60;
+  // Fonction pour formater la durée de la pause en heures et minutes
+  const formatPause = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
 
-		if (hours > 0 && remainingMinutes > 0) {
-			return `${hours}h${remainingMinutes}mn`;
-		} else if (hours > 0) {
-			return `${hours}h`;
-		} else {
-			return `${remainingMinutes}mn`;
-		}
-	};
+    if (hours > 0 && remainingMinutes > 0) {
+      return `${hours}h${remainingMinutes}mn`;
+    } else if (hours > 0) {
+      return `${hours}h`;
+    } else {
+      return `${remainingMinutes}mn`;
+    }
+  };
 
-	  // Fonction pour demander la confirmation de suppression
-		const handleDeleteTaskClick = (taskId) => {
-			setSelectedTaskId(taskId); // Enregistre l'ID de la tâche sélectionnée
-			setOpenDeleteDialog(true); // Ouvre le dialog
-		};
+  // Fonction pour demander la confirmation de suppression
+  const handleDeleteTaskClick = (taskId) => {
+    setSelectedTaskId(taskId); // Enregistre l'ID de la tâche sélectionnée
+    setOpenDeleteDialog(true); // Ouvre le dialog
+  };
 
-		// Fonction pour confirmer et supprimer la tâche
-		const confirmDeleteTask = async () => {
-			try {
-				await api.deleteTask(selectedTaskId); // Supprime la tâche avec l'ID sélectionné
-				await fetchTasksForWeek(); // Rafraîchit la liste des tâches
-				setOpenDeleteDialog(false); // Ferme le dialog
-				setDeleteAlertOpen(true); // Affiche l'alerte
-			} catch (error) {
-				console.error("Erreur lors de la suppression de la tâche", error);
-			}
-		};
+  // Fonction pour confirmer et supprimer la tâche
+  const confirmDeleteTask = async () => {
+    try {
+      await api.deleteTask(selectedTaskId); // Supprime la tâche avec l'ID sélectionné
+      await fetchTasksForWeek(); // Rafraîchit la liste des tâches
+      setOpenDeleteDialog(false); // Ferme le dialog
+      setDeleteAlertOpen(true); // Affiche l'alerte
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la tâche", error);
+    }
+  };
 
-		const handleCloseDeleteDialog = () => {
-			setOpenDeleteDialog(false); // Ferme le dialog sans supprimer
-			setSelectedTaskId(null); // Réinitialise l'ID de la tâche
-		};
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false); // Ferme le dialog sans supprimer
+    setSelectedTaskId(null); // Réinitialise l'ID de la tâche
+  };
+
+	const { generatePDF } = GeneratePDF({
+		employees,
+		weekDates,
+		weekDate,
+		getTasksForEmployeeAndDate,
+		calculateTotalHoursForWeek,
+		formatEmployeeName,
+		formatPause
+	});
 
   return (
     <div className="schedule-container">
@@ -206,16 +217,17 @@ const Schedule = () => {
           </Tooltip>
 
           <Tooltip title="Télécharger en PDF" placement="top">
-            <IconButton
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#FFC107",
-                },
-              }}
-            >
-              <FileDownloadOutlined />
-            </IconButton>
-          </Tooltip>
+						<IconButton
+							onClick={generatePDF}
+							sx={{
+								"&:hover": {
+									backgroundColor: "#FFC107",
+								},
+							}}
+						>
+							<FileDownloadOutlined />
+						</IconButton>
+					</Tooltip>
         </Box>
 
         <Box sx={{ flexGrow: 1, display: "initial", justifyContent: "center" }}>
@@ -225,7 +237,7 @@ const Schedule = () => {
         <Box sx={{ width: "5%" }} />
       </Toolbar>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} id="schedule-table">
         <Table aria-label="schedule table">
           <TableHead>
             <TableRow>
@@ -248,31 +260,31 @@ const Schedule = () => {
                   return (
                     <TableCell key={date}>
                       {tasksForDay.map((task) => (
-												<div key={task.id} className="task" onClick={() => openUpdateDrawer(task.id)} style={{ borderLeft: `5px solid ${task.couleur}` }}>
-													<span className="task-time">
-														{format(parse(task.heure_debut, "HH:mm:ss", new Date()), "HH:mm")} - {format(parse(task.heure_fin, "HH:mm:ss", new Date()), "HH:mm")}
-													</span>
-													<br />
-													<span className="task-title">{task.nom_type_tache}</span><br />
-													{task.pause > 0 && (
-														<span className="task-pause"><PauseCircleOutlined sx={{ width: '30%' }}/> {formatPause(task.pause)}</span>
-													)}
-													<div className="delete-task">
-														<IconButton
-															aria-label="delete"
-															size="small"
-															sx={{ color: "#B71C1C", "&:hover": { backgroundColor: "#FFEBEE" } }}
-															onClick={(event) => {
-																event.stopPropagation(); // Empêche l'ouverture du Drawer
-																handleDeleteTaskClick(task.id); // Exécute uniquement la suppression
-															}}
-														>
-															<Delete fontSize="inherit" />
-														</IconButton>
+                        <div key={task.id} className="task" onClick={() => openUpdateDrawer(task.id)} style={{ borderLeft: `5px solid ${task.couleur}` }}>
+                          <span className="task-time">
+                            {format(parse(task.heure_debut, "HH:mm:ss", new Date()), "HH:mm")} - {format(parse(task.heure_fin, "HH:mm:ss", new Date()), "HH:mm")}
+                          </span>
+                          <br />
+                          <span className="task-title">{task.nom_type_tache}</span><br />
+                          {task.pause > 0 && (
+                            <span className="task-pause"><PauseCircleOutlined sx={{ width: '30%' }}/> {formatPause(task.pause)}</span>
+                          )}
+                          <div className="delete-task">
+                            <IconButton
+                              aria-label="delete"
+                              size="small"
+                              sx={{ color: "#B71C1C", "&:hover": { backgroundColor: "#FFEBEE" } }}
+                              onClick={(event) => {
+                                event.stopPropagation(); // Empêche l'ouverture du Drawer
+                                handleDeleteTaskClick(task.id); // Exécute uniquement la suppression
+                              }}
+                            >
+                              <Delete fontSize="inherit" />
+                            </IconButton>
 
-													</div>
-												</div>
-											))}
+                          </div>
+                        </div>
+                      ))}
 
                     </TableCell>
                   );
@@ -288,13 +300,13 @@ const Schedule = () => {
         <AddTasksForm onSubmit={handleTaskSubmit} onClose={closeAddDrawer} />
       </CustomDrawer>
 
-			{isUpdateDrawerOpen && selectedTaskId && (
-				<CustomDrawer isOpen={isUpdateDrawerOpen} onClose={closeUpdateDrawer} title="Modifier la plage horaire">
-					<UpdateTasksForm taskId={selectedTaskId} onUpdate={handleUpdateTaskSubmit} onClose={closeUpdateDrawer} />
-				</CustomDrawer>
-			)}
+      {isUpdateDrawerOpen && selectedTaskId && (
+        <CustomDrawer isOpen={isUpdateDrawerOpen} onClose={closeUpdateDrawer} title="Modifier la plage horaire">
+          <UpdateTasksForm taskId={selectedTaskId} onUpdate={handleUpdateTaskSubmit} onClose={closeUpdateDrawer} />
+        </CustomDrawer>
+      )}
 
-			{/* Dialog de confirmation de suppression */}
+      {/* Dialog de confirmation de suppression */}
       <Dialog
         open={openDeleteDialog}
         onClose={handleCloseDeleteDialog}
