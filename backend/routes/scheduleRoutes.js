@@ -19,4 +19,7 @@ router.delete('/tasks/:id', scheduleController.deleteTask);
 // Route pour modifier une tâche
 router.put('/tasks/:id', scheduleController.updateTask);
 
+// Route pour récupérer les types de tâches
+router.get('/task-types', scheduleController.getTaskTypes);
+
 module.exports = router;
