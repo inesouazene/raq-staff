@@ -26,6 +26,22 @@ const scheduleModel = require('../models/schedule');
 			}
 		},
 
+		// Méthode pour récupérer une tâche par son id
+		getTaskById: async (req, res) => {
+			try {
+				const id = req.params.id;
+				const task = await scheduleModel.getTaskById(id);
+				if (task) {
+					res.status(200).json(task);
+				} else {
+					res.status(404).json({ message: "Tâche non trouvée" });
+				}
+			} catch (error) {
+				console.error("Erreur lors de la récupération de la tâche :", error);
+				res.status(500).json({ message: "Erreur serveur" });
+			}
+		},
+
 		// Méthode pour ajouter une tâche
 		addTask: async (req, res) => {
 			try {
@@ -103,6 +119,8 @@ const scheduleModel = require('../models/schedule');
 			  res.status(500).json({ error: error.message });
 			}
 		},
-};
+
+	};
+
 
 module.exports = scheduleController;
