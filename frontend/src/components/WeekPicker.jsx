@@ -74,7 +74,7 @@ const WeekPicker = ({ onChange }) => {
           <FaArrowLeft />
         </Button>
         <DatePicker
-          style={{ width: '20%' }}
+          style={{ width: '25%' }}
           appearance="subtle"
           caretAs={FaCalendarCheck}
           placeholder="Sélectionner une semaine"
