@@ -10,7 +10,13 @@ import {
   Select,
   Box,
   FormHelperText,
+	Container,
+	ListItemText,
+	Divider,
+	Chip,
+	Typography,
 } from '@mui/material';
+import { ContentCopyRounded, Update } from "@mui/icons-material";
 import { DatePicker } from '@mui/x-date-pickers';
 import { format, addMinutes, setHours, setMinutes, parse } from 'date-fns';
 import api from '../services/api';
@@ -24,6 +30,7 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
   const [employees, setEmployees] = useState([]);
   const [taskTypes, setTaskTypes] = useState([]);
   const [pause, setPause] = useState('');
+	const [selectedEmployees, setSelectedEmployees] = useState([]);
 
   const generateTimeOptions = () => {
     const startTime = setHours(setMinutes(new Date(), 0), 0);
@@ -83,7 +90,7 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
       heure_debut: heureDebut,
       heure_fin: heureFin,
       id_type_tache: taskType,
-	  id_salarie: selectedEmployee,
+	  	id_salarie: selectedEmployee,
       pause: parsePause(pause),
     };
 
@@ -92,7 +99,7 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
       onUpdate(formData);
       onClose();
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de la tâche", error);
+      console.error("Erreur lors de la mise à jour de la plage horaire", error);
     }
   };
 
@@ -103,8 +110,35 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
     return !isNaN(customMinutes) ? customMinutes : 0;
   };
 
+	const handleCopyConfirm = async () => {
+		try {
+			const taskData = {
+				date_tache: format(date, 'yyyy-MM-dd'),
+				heure_debut: heureDebut,
+				heure_fin: heureFin,
+				id_salarie: selectedEmployees,
+				id_type_tache: taskType,
+				pause: parsePause(pause),
+			};
+
+			await api.addTask(taskData);
+			setSelectedEmployees([]);
+			onUpdate(taskData);
+			// Rafraîchir les tâches après la copie
+			if (onUpdate) {
+				onUpdate();
+			}
+		} catch (error) {
+			console.error('Erreur lors de la copie des tâches:', error);
+		}
+	};
+
   return (
+		<Container>
+		<Divider textAlign='left' sx={{ fontVariant: 'small-caps', fontWeight: 'bold', fontSize: 16, marginTop: 5 }}>Modifier la plage horaire</Divider>
+
     <Box sx={{ padding: '20px', display: 'flex', gap: 2 }}>
+
       {/* Première colonne avec tous les champs sauf Pause */}
       <Box sx={{ flex: 1 }}>
         <DatePicker
@@ -113,7 +147,7 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
           onChange={handleDateChange}
           required
           slots={{ textField: TextField }}
-          slotProps={{ textField: { fullWidth: true, margin: 'normal' } }}
+          slotProps={{ textField: { fullWidth: true, margin: 'normal', size: 'small',  } }}
         />
 
         <Box sx={{ display: 'flex', gap: 2, marginTop: 1 }}>
@@ -125,7 +159,7 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
               onInputChange={handleStartTimeChange}
               onChange={handleStartTimeChange}
               renderInput={(params) => (
-                <TextField {...params} label="Début" fullWidth required />
+                <TextField {...params} label="Début" fullWidth required size="small"/>
               )}
             />
           </FormControl>
@@ -138,7 +172,7 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
               onInputChange={handleEndTimeChange}
               onChange={handleEndTimeChange}
               renderInput={(params) => (
-                <TextField {...params} label="Fin" fullWidth required />
+                <TextField {...params} label="Fin" fullWidth required size="small"/>
               )}
             />
           </FormControl>
@@ -150,6 +184,7 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
             label="Type de tâche"
             value={taskType}
             onChange={handleTaskTypeChange}
+						size='small'
           >
             {taskTypes.map((type) => (
               <MenuItem key={type.id} value={type.id}>
@@ -171,11 +206,12 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
         </FormControl>
 
         <FormControl fullWidth margin="normal" required>
-          <InputLabel>Salariés</InputLabel>
+          <InputLabel>Salarié</InputLabel>
           <Select
-            label="Salariés"
+            label="Salarié"
             value={selectedEmployee}
             onChange={handleEmployeesChange}
+						size='small'
           >
             {employees.map((employee) => (
               <MenuItem key={employee.id} value={employee.id}>
@@ -185,17 +221,9 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
           </Select>
         </FormControl>
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          fullWidth
-          sx={{ marginTop: 2 }}
-          disabled={!date || !heureDebut || !heureFin || !taskType || selectedEmployee.length === 0}
-        >
-          Mettre à jour
-        </Button>
       </Box>
+
+
 
       {/* Deuxième colonne pour le champ Pause */}
       <Box sx={{ width: '30%' }}>
@@ -207,7 +235,7 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
             onInputChange={handlePauseChange}
             onChange={(event, newValue) => handlePauseChange(event, newValue)}
             renderInput={(params) => (
-              <TextField {...params} label="Pause" placeholder="Durée" fullWidth />
+              <TextField {...params} label="Pause" placeholder="Durée" fullWidth size='small'/>
             )}
           />
           <FormHelperText id="component-helper-text" sx={{ fontStyle: 'italic', fontWeight: 'bold' }}>
@@ -216,6 +244,81 @@ const UpdateTasksForm = ({ taskId, onUpdate, onClose }) => {
         </FormControl>
       </Box>
     </Box>
+
+		<Divider textAlign='left' sx={{ fontVariant: 'small-caps', fontWeight: 'bold', fontSize: 16, marginTop: 3 }}>Copier la plage horaire</Divider>
+
+		<Box sx={{ padding: '20px', display: 'flex', gap: 2 }}>
+
+			<Box sx={{ display: 'flex', width: '70%' }}>
+			<FormControl fullWidth>
+				<InputLabel>Dupliquer à ...</InputLabel>
+					<Select
+							label="Dupliquer à ..."
+							multiple
+							value={selectedEmployees}
+							onChange={(e) => setSelectedEmployees(e.target.value)}
+							renderValue={(selected) => (
+									<Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+											{selected.map((id) => {
+													const employee = employees.find((emp) => emp.id === id);
+													return (
+															<Chip
+																	key={id}
+																	label={employee ? employee.name : id}
+																	sx={{ margin: '2px' }}
+															/>
+													);
+											})}
+									</Box>
+							)}
+					>
+							{employees
+							.filter((employee) => employee.id !== selectedEmployee) // Exclure le salarié sélectionné
+							.map((employee) => (
+									<MenuItem key={employee.id} value={employee.id}>
+											<ListItemText primary={employee.name} />
+									</MenuItem>
+							))}
+					</Select>
+					<FormHelperText id="component-helper-text" sx={{ fontStyle: 'italic', fontWeight: 'bold' }}>
+							Sélectionnez le(s) salarié(s)
+					</FormHelperText>
+			</FormControl>
+			</Box>
+			<Box sx={{ width: '30%' }}>
+				<Button
+					variant="contained"
+					startIcon={<ContentCopyRounded />}
+					onClick={handleCopyConfirm}
+					color="secondary"
+					sx={{ marginTop: 1, width: '100%', fontWeight: 'bold' }}
+				>
+				Copier
+				</Button>
+				</Box>
+			</Box>
+
+		<Divider textAlign='left' sx={{ fontVariant: 'small-caps', fontWeight: 'bold', fontSize: 16, marginTop: 2 }}>Mettre à jour le planning</Divider>
+			<Box sx={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+					<Typography sx={{ fontSize: 12, textAlign: 'left', fontStyle: 'italic' }} startIcon="ErrorOutline">
+							Pour appliquer un changement sur une plage horaire et/ou valider une duplication, cliquez sur &quot;Valider&quot;.
+					</Typography>
+
+		<Button
+          variant="contained"
+          color="primary"
+					startIcon={<Update />}
+          onClick={handleSubmit}
+          fullWidth
+          sx={{ marginTop: 1, width: '100%', fontWeight: 'bold', color: 'white' }}
+          disabled={!date || !heureDebut || !heureFin || !taskType || selectedEmployee.length === 0}
+        >
+          Valider
+        </Button>
+			</Box>
+
+		</Container>
+
   );
 };
 
