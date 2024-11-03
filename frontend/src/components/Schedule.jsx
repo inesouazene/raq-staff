@@ -4,15 +4,16 @@ import { useState, useEffect, useCallback } from "react";
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, parseISO, parse, differenceInMinutes } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Toolbar, Box, Tooltip, IconButton, Snackbar, Alert, Dialog, DialogContent, DialogTitle, DialogActions, DialogContentText, Button } from "@mui/material";
-import { AddOutlined, FileDownloadOutlined, Delete, PauseCircleOutlined } from "@mui/icons-material";
+import { AddOutlined, FileDownloadOutlined, DeleteForever, PauseCircleOutlined, ContentCopyRounded } from "@mui/icons-material";
 import api from "../services/api";
 import WeekPicker from "./WeekPicker";
 import AddTasksForm from "./AddTasksForm";
 import UpdateTasksForm from "./UpdateTasksForm";
 import CustomDrawer from "./CustomDrawer";
+import DuplicateTasksForm from "./DuplicateTasksForm";
+import GeneratePDF from "./GeneratePDF";
 import "../styles/Schedule.css";
 import "../styles/TasksStyles.css";
-import GeneratePDF from "./GeneratePDF";
 
 
 const getWeekDates = (date) => {
@@ -32,6 +33,8 @@ const Schedule = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [isUpdateDrawerOpen, setIsUpdateDrawerOpen] = useState(false);
+	const [isDuplicateDrawerOpen, setIsDuplicateDrawerOpen] = useState(false);
+
 
   // Fonction pour charger les tâches de la semaine
   const fetchTasksForWeek = useCallback(async () => {
@@ -86,6 +89,10 @@ const Schedule = () => {
     setIsUpdateDrawerOpen(false);
     setSelectedTaskId(null);
   }
+
+	// Fonction pour ouvrir/fermer le drawer de duplication
+	const openDuplicateDrawer = () => setIsDuplicateDrawerOpen(true);
+	const closeDuplicateDrawer = () => setIsDuplicateDrawerOpen(false);
 
   // Chargement des employés
   useEffect(() => {
@@ -228,6 +235,19 @@ const Schedule = () => {
 							<FileDownloadOutlined />
 						</IconButton>
 					</Tooltip>
+
+          <Tooltip title="Dupliquer le planning" placement="top">
+						<IconButton
+							onClick={openDuplicateDrawer}
+							sx={{
+								"&:hover": {
+									backgroundColor: "#007acc",
+								},
+							}}
+						>
+							<ContentCopyRounded />
+						</IconButton>
+					</Tooltip>
         </Box>
 
         <Box sx={{ flexGrow: 1, display: "initial", justifyContent: "center" }}>
@@ -273,13 +293,13 @@ const Schedule = () => {
                             <IconButton
                               aria-label="delete"
                               size="small"
-                              sx={{ color: "#B71C1C", "&:hover": { backgroundColor: "#FFEBEE" } }}
+                              sx={{ color: "#E53935", "&:hover": { backgroundColor: "#FFEBEE" } }}
                               onClick={(event) => {
                                 event.stopPropagation(); // Empêche l'ouverture du Drawer
                                 handleDeleteTaskClick(task.id); // Exécute uniquement la suppression
                               }}
                             >
-                              <Delete fontSize="inherit" />
+                              <DeleteForever fontSize="inherit" />
                             </IconButton>
 
                           </div>
@@ -301,10 +321,15 @@ const Schedule = () => {
       </CustomDrawer>
 
       {isUpdateDrawerOpen && selectedTaskId && (
-        <CustomDrawer isOpen={isUpdateDrawerOpen} onClose={closeUpdateDrawer} title="Modifier la plage horaire">
+        <CustomDrawer isOpen={isUpdateDrawerOpen} onClose={closeUpdateDrawer} title="Détails de la plage horaire">
           <UpdateTasksForm taskId={selectedTaskId} onUpdate={handleUpdateTaskSubmit} onClose={closeUpdateDrawer} />
         </CustomDrawer>
       )}
+
+			{/* Drawer de duplication */}
+      <CustomDrawer isOpen={isDuplicateDrawerOpen} onClose={closeDuplicateDrawer} title="Dupliquer un planning">
+        <DuplicateTasksForm onClose={closeDuplicateDrawer} onDuplicate={fetchTasksForWeek} />
+      </CustomDrawer>
 
       {/* Dialog de confirmation de suppression */}
       <Dialog
