@@ -8,7 +8,7 @@ export const lightTheme = createTheme({
       main: '#05be46',
     },
     secondary: {
-      main: '#ff4081',
+      main: '#007acc',
     },
     background: {
       default: '#fff',
@@ -76,7 +76,7 @@ export const lightTheme = createTheme({
         },
       },
     },
-  },
+	},
 });
 
 // Thème sombre (Dark Mode)
@@ -87,7 +87,7 @@ export const darkTheme = createTheme({
       main: '#05be46',
     },
     secondary: {
-      main: '#f48fb1',
+      main: '#007acc',
     },
     background: {
       default: '#3e3e3e',
