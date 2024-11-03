@@ -37,7 +37,7 @@ const api = {
       const response = await axios.post(`${API_URL}/schedules/tasks/add`, taskData);
       return response.data;
     } catch (error) {
-      console.error("Erreur lors de l'ajout de la tâche : ", error);
+      console.error("Erreur lors de l'ajout ou de la copie de la plage horaire : ", error);
       throw error;
     }
   },
@@ -84,6 +84,20 @@ const api = {
       throw error;
     }
   },
+	// Dupliquer des tâches d'une semaine vers une ou plusieurs autres semaines
+  duplicateTasks: async ({ sourceWeek, destinationWeeks }) => {
+    try {
+      const response = await axios.post(`${API_URL}/schedules/tasks/duplicate`, {
+        sourceWeek,
+        destinationWeeks,  // Utilisation correcte du paramètre `destinationWeeks`
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de la duplication des tâches : ", error);
+      throw error;
+    }
+  },
+
 
 }
 export default api;
