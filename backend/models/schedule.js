@@ -90,8 +90,22 @@ const scheduleModel = {
 		const result = await db.query(query);
 		return result.rows; // Retourne tous les types de tâches
 	},
-
-
+	// Fonction pour dupliquer les tâches d'une semaine à une autre
+	duplicateTasks: async (sourceWeek, destinationWeek) => {
+		try {
+		  const query = `
+			INSERT INTO taches (date_tache, heure_debut, heure_fin, id_salarie, id_type_tache, pause)
+			SELECT
+			  date_tache + ($2::date - $1::date), heure_debut, heure_fin, id_salarie, id_type_tache, pause
+			FROM taches
+			WHERE date_tache BETWEEN $1 AND ($1 + interval '6 days')
+		  `;
+		  await db.query(query, [sourceWeek, destinationWeek]);
+		} catch (error) {
+		  console.error("Erreur dans duplicateTasks du modèle :", error);
+		  throw error;
+		}
+	  }
 };
 
 

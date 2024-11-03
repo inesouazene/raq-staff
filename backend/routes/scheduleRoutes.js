@@ -25,5 +25,7 @@ router.put('/tasks/:id', scheduleController.updateTask);
 // Route pour récupérer les types de tâches
 router.get('/task-types', scheduleController.getTaskTypes);
 
+// Route pour dupliquer les tâches d'une semaine vers une autre
+router.post('/tasks/duplicate', scheduleController.duplicateTasks);
 
 module.exports = router;

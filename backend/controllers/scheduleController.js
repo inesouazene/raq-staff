@@ -111,6 +111,7 @@ const scheduleModel = require('../models/schedule');
 				res.status(500).json({ error: error.message });
 			}
 		},
+		// Méthode pour récupérer les types de tâches
 		getTaskTypes: async (req, res) => {
 			try {
 			  const taskTypes = await scheduleModel.getTaskTypes();
@@ -119,6 +120,32 @@ const scheduleModel = require('../models/schedule');
 			  res.status(500).json({ error: error.message });
 			}
 		},
+		// Méthode pour dupliquer les tâches d'une semaine vers une ou plusieurs semaine(s) de destination
+		duplicateTasks: async (req, res) => {
+			let { sourceWeek, destinationWeeks } = req.body;
+
+			// Vérifiez si destinationWeeks est un tableau
+			if (!Array.isArray(destinationWeeks)) {
+			  return res.status(400).json({ error: "destinationWeeks doit être un tableau." });
+			}
+
+			try {
+			  sourceWeek = new Date(sourceWeek.start);
+			  console.log("Source Week:", sourceWeek);
+
+			  for (let destinationWeek of destinationWeeks) {
+				destinationWeek = new Date(destinationWeek.start);
+				console.log("Destination Week:", destinationWeek);
+				await scheduleModel.duplicateTasks(sourceWeek, destinationWeek);
+			  }
+
+			  res.status(200).json({ message: "Tâches dupliquées avec succès pour toutes les semaines de destination !" });
+			} catch (error) {
+			  console.error("Erreur dans duplicateTasks du contrôleur :", error);
+			  res.status(500).json({ error: error.message });
+			}
+		}
+
 
 	};
 
