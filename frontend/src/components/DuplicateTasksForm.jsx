@@ -48,7 +48,6 @@ const DuplicateTasksForm = ({ onClose, onDuplicate }) => {
       console.log("Données envoyées pour duplication :", data);
 
       await api.duplicateTasks(data);
-      alert("Les tâches ont été dupliquées avec succès !");
       onDuplicate();
       onClose();
     } catch (error) {
