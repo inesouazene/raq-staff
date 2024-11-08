@@ -4,7 +4,18 @@ import axios from 'axios';
 const API_URL = 'http://localhost:5001'; // Ajustez l'URL si nécessaire
 
 const api = {
-  // Récupérer la liste de tous les employés
+	// Récupérer tous les salariés et leurs informations
+	getAllEmployeesInfo: async () => {
+		try {
+			const response = await axios.get(`${API_URL}/employees`);
+			return response.data;
+		} catch (error) {
+			console.error("Erreur lors de la récupération des salariés : ", error);
+			throw error;
+		}
+	},
+
+  // Récupérer la liste de tous les salariés
   getAllEmployees: async () => {
     try {
       const response = await axios.get(`${API_URL}/schedules/employees`);
