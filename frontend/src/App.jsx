@@ -8,6 +8,7 @@ import { lightTheme, darkTheme } from './themes/theme';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'; // Pour date-fns v3 ou v4
 import { fr } from 'date-fns/locale';
+import './index.css';
 
 
 // Importing the lazy-loaded components
@@ -15,6 +16,7 @@ const HomePage = lazy(() => import('./components/HomePage'));
 const Employees = lazy(() => import('./components/Employees'));
 const EmployeeDetails = lazy(() => import('./components/EmployeeDetails'));
 const Schedule = lazy(() => import('./components/Schedule'));
+const TimeTracking = lazy(() => import('./components/TimeTracking'));
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -35,6 +37,7 @@ function App() {
               <Route path="/employees" element={<Employees />} />
               <Route path="/employees/:id" element={<EmployeeDetails />} />
               <Route path="/schedules" element={<Schedule />} />
+							<Route path="/time-tracking" element={<TimeTracking />} />
             </Routes>
           </Suspense>
         </DashboardLayout>
