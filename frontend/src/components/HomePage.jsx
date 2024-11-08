@@ -1,6 +1,5 @@
 // components/HomePage.js
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 function HomePage() {
   const [message, setMessage] = useState('');
@@ -23,9 +22,7 @@ function HomePage() {
   return (
     <div>
       <h1>{message}</h1>
-      <Link to="/employees">
-        <button>Voir la liste des employés</button>
-      </Link>
+
     </div>
   );
 }
