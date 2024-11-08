@@ -18,6 +18,7 @@ import {
   HomeRounded,
   PeopleRounded,
   CalendarMonthRounded,
+	TimerOutlined,
 } from '@mui/icons-material';
 import { Link, useLocation } from 'react-router-dom';
 import MaterialUISwitch from './MaterialUISwitch';
@@ -36,6 +37,8 @@ const DashboardLayout = ({ children, isDarkMode, toggleTheme }) => {
         return 'Salariés';
       case '/schedules':
         return 'Planning';
+			case '/time-tracking':
+				return 'Suivi des heures';
       default:
         return 'Tableau de bord';
     }
@@ -48,7 +51,8 @@ const DashboardLayout = ({ children, isDarkMode, toggleTheme }) => {
         {[
           { to: '/', icon: <HomeRounded />, label: 'Accueil' },
           { to: '/employees', icon: <PeopleRounded />, label: 'Salariés' },
-          { to: '/schedules', icon: <CalendarMonthRounded />, label: 'Planning' }
+          { to: '/schedules', icon: <CalendarMonthRounded />, label: 'Planning' },
+					{ to: '/time-tracking', icon: <TimerOutlined />, label: 'Suivi des heures' }
         ].map((item) => (
           <ListItem
             key={item.to}
