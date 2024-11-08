@@ -1,0 +1,15 @@
+.time-tracking-container {
+	overflow: auto;
+	max-height: 100%;
+  }
+
+.tabs {
+	display: flex;
+	align-items: center;
+	font-weight: bold;
+	margin-bottom: 1%;
+}
+
+.annual-table {
+	width: fit-content; /* Adapte la largeur de chaque colonne en fonction du contenu */
+  }
