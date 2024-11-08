@@ -30,6 +30,7 @@ const Schedule = () => {
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
+	const [duplicateAlertOpen, setDuplicateAlertOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [isUpdateDrawerOpen, setIsUpdateDrawerOpen] = useState(false);
@@ -80,6 +81,9 @@ const Schedule = () => {
   // Fonction pour fermer l'alerte de suppression automatiquement
   const handleDeleteAlertClose = () => setDeleteAlertOpen(false);
 
+	// Fonction pour fermer l'alerte de duplication automatiquement
+	const handleDuplicateAlertClose = () => setDuplicateAlertOpen(false);
+
   // Ouverture et fermeture du drawer de mise à jour
   const openUpdateDrawer = (taskId) => {
     setSelectedTaskId(taskId);
@@ -121,10 +125,11 @@ const Schedule = () => {
     setWeekDate(objWeek.date);
   };
 
-  const formatEmployeeName = (fullName) => {
-    const [firstName, lastName] = fullName.split(" ");
-    return lastName ? `${firstName} ${lastName.charAt(0)}.` : firstName;
-  };
+	const formatEmployeeName = (fullName) => {
+		const [firstName, lastName] = fullName.split(" ");
+		const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+		return lastName ? `${formattedFirstName} ${lastName.charAt(0).toUpperCase()}.` : formattedFirstName;
+	};
 
   const getTasksForEmployeeAndDate = (employeeId, date) => {
     return tasks
@@ -328,7 +333,13 @@ const Schedule = () => {
 
 			{/* Drawer de duplication */}
       <CustomDrawer isOpen={isDuplicateDrawerOpen} onClose={closeDuplicateDrawer} title="Dupliquer un planning">
-        <DuplicateTasksForm onClose={closeDuplicateDrawer} onDuplicate={fetchTasksForWeek} />
+        <DuplicateTasksForm
+					onClose={closeDuplicateDrawer}
+					onDuplicate={() => {
+						fetchTasksForWeek();
+						setDuplicateAlertOpen(true);
+					}}
+				/>
       </CustomDrawer>
 
       {/* Dialog de confirmation de suppression */}
@@ -374,6 +385,17 @@ const Schedule = () => {
       >
         <Alert onClose={handleDeleteAlertClose} severity="success" sx={{ width: '100%' }}>
           Plage horaire supprimée avec succès !
+        </Alert>
+      </Snackbar>
+
+			<Snackbar
+        open={duplicateAlertOpen}
+        autoHideDuration={5000} // Durée de 5 secondes
+        onClose={handleDuplicateAlertClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Position de l'alerte
+      >
+        <Alert onClose={handleDuplicateAlertClose} severity="success" sx={{ width: '100%' }}>
+          Le planning a été dupliqué avec succès !
         </Alert>
       </Snackbar>
 
