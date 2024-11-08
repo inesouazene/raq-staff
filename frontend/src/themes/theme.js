@@ -23,6 +23,15 @@ export const lightTheme = createTheme({
     },
   },
   components: {
+		MuiLink: {
+			styleOverrides: {
+				root: {
+					color: '#007acc',
+					textDecoration: 'none',
+					fontWeight: 'bold',
+				},
+			},
+		},
 		MuiOutlinedInput: {
 			styleOverrides: {
 				root: {
@@ -55,7 +64,7 @@ export const lightTheme = createTheme({
           textAlign: 'center',
         },
         body: {
-          color: '#000',
+          color: '#3e3e42',
           borderRight: '1px solid #ddd',
           fontWeight: 'bold',
           '&:not(:first-of-type):not(:last-child)': {
@@ -102,6 +111,15 @@ export const darkTheme = createTheme({
     },
   },
   components: {
+		MuiLink: {
+			styleOverrides: {
+				root: {
+					color: '#007acc',
+					textDecoration: 'none',
+					fontWeight: 'bold',
+				},
+			},
+		},
 		MuiOutlinedInput: {
 			styleOverrides: {
 				root: {
@@ -138,7 +156,7 @@ export const darkTheme = createTheme({
           color: '#ffffff',
           borderRight: '1px solid rgba(81, 81, 81, 1)',
           fontWeight: 'bold',
-          '&:not(:first-child):not(:last-child)': {
+          '&:not(:first-of-type):not(:last-child)': {
             '&:hover': {
               backgroundColor: 'rgba(255, 255, 255, 0.08)',
               transition: 'background-color 0.3s ease',
